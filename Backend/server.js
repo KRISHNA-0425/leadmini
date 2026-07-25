@@ -2,7 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import helmet from 'helmet'
+import helmet from 'helmet';
 
 import { connectDB } from './src/config/db.js';
 import authRoutes from './src/routes/auth.routes.js';
@@ -12,13 +12,11 @@ import { generalLimiter } from './src/middleware/rateLimiter.js';
 
 dotenv.config();
 
-connectDB();
-
 const app = express();
 
-// app.set('trust proxy', 1);
+app.set('trust proxy', 1);
 
-app.use(helmet())
+app.use(helmet());
 
 app.use(
   cors({
@@ -39,5 +37,13 @@ app.use('/api/leads', leadRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const PORT = process.env.PORT || 3000;
+
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  })
+  .catch((err) => {
+    console.error('Failed to connect to DB, server not started:', err);
+    process.exit(1);
+  });
