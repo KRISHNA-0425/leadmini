@@ -9,12 +9,11 @@ export default function Admin() {
 
   useEffect(() => {
     fetchLeads();
-  },[fetchLeads])
-
+  }, [fetchLeads]);
 
   const filteredLeads = leads.filter(lead =>
-    lead.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    lead.email.toLowerCase().includes(searchQuery.toLowerCase())
+    (lead.name ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (lead.email ?? '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -55,7 +54,7 @@ export default function Admin() {
             {filteredLeads.map((lead, i) => (
               <motion.li
                 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                key={lead.id}
+                key={lead._id}
                 className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors gap-4"
               >
                 <div>
@@ -68,7 +67,7 @@ export default function Admin() {
                   <div className={`h-2 w-2 rounded-full ${lead.status === 'New' ? 'bg-blue-500' : lead.status === 'Contacted' ? 'bg-amber-500' : 'bg-emerald-500'}`} />
                   <select
                     value={lead.status}
-                    onChange={(e) => updateLeadStatus(lead.id, e.target.value)}
+                    onChange={(e) => updateLeadStatus(lead._id, e.target.value)}
                     className="p-2 text-sm font-medium border border-zinc-200 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-950 cursor-pointer outline-none w-full md:w-auto"
                   >
                     <option value="New">Status: New</option>

@@ -5,6 +5,9 @@ export const useLeadStore = create((set) => ({
   leads: [],
   isSubmitting: false,
   error: null,
+  searchQuery: '',
+
+  setSearchQuery: (query) => set({ searchQuery: query }),
 
   addLead: async (formData) => {
     set({ isSubmitting: true, error: null });
