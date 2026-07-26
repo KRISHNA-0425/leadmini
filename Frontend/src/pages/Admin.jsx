@@ -16,6 +16,7 @@ export default function Admin() {
     showActiveOnly,
     setShowActiveOnly,
     updateLeadStatus,
+    deleteLead,
     fetchLeads,
   } = useLeadStore();
   const logout = useAuthStore((state) => state.logout);
@@ -23,6 +24,7 @@ export default function Admin() {
   const [selectedLead, setSelectedLead] = useState(null);
   const [pendingStatus, setPendingStatus] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   useEffect(() => {
     fetchLeads();
@@ -36,6 +38,7 @@ export default function Admin() {
   const closeModal = () => {
     setSelectedLead(null);
     setPendingStatus(null);
+    setConfirmingDelete(false);
   };
 
   const saveStatus = async () => {
@@ -48,6 +51,16 @@ export default function Admin() {
       console.error('Failed to update status', err);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selectedLead) return;
+    try {
+      await deleteLead(selectedLead._id);
+      closeModal();
+    } catch (err) {
+      console.error('Failed to delete lead', err);
     }
   };
 
@@ -72,7 +85,8 @@ export default function Admin() {
     >
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-4">
         <div>
-          <h1 className="text-4xl font-bold tracking-tight mb-2 text-zinc-900 dark:text-zinc-100">Pipeline Console</h1>
+          {/* Fixed heading color for both light and dark themes */}
+          <h1 className="text-4xl font-bold tracking-tight mb-2 text-zinc-600 dark:text-zinc-100">Pipeline Console</h1>
           <p className="text-zinc-600 dark:text-zinc-400">Manage and track incoming data streams.</p>
         </div>
         <button onClick={logout} className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
@@ -182,7 +196,7 @@ export default function Admin() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 mb-4">
                 <select
                   value={pendingStatus}
                   onChange={(e) => setPendingStatus(e.target.value)}
@@ -199,6 +213,33 @@ export default function Admin() {
                 >
                   {isSaving ? 'Saving...' : 'Save'}
                 </button>
+              </div>
+
+              <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800">
+                {confirmingDelete ? (
+                  <div className="flex items-center gap-3">
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400 flex-1">Delete this lead permanently?</p>
+                    <button
+                      onClick={() => setConfirmingDelete(false)}
+                      className="px-4 py-2 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleDelete}
+                      className="px-4 py-2 text-sm font-medium rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors"
+                    >
+                      Confirm delete
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setConfirmingDelete(true)}
+                    className="text-sm font-medium text-red-600 hover:text-red-700 transition-colors"
+                  >
+                    Delete lead
+                  </button>
+                )}
               </div>
             </motion.div>
           </motion.div>
