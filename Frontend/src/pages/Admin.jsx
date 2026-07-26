@@ -73,7 +73,7 @@ export default function Admin() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-4">
         <div>
           <h1 className="text-4xl font-bold tracking-tight mb-2 text-zinc-900 dark:text-zinc-100">Pipeline Console</h1>
-          <p className="text-zinc-500 dark:text-zinc-400">Manage and track incoming data streams.</p>
+          <p className="text-zinc-600 dark:text-zinc-400">Manage and track incoming data streams.</p>
         </div>
         <button onClick={logout} className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
           Terminate Session
