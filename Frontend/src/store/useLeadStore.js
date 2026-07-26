@@ -6,8 +6,12 @@ export const useLeadStore = create((set) => ({
   isSubmitting: false,
   error: null,
   searchQuery: '',
+  sortOrder: 'newest',
+  showActiveOnly: false,
 
   setSearchQuery: (query) => set({ searchQuery: query }),
+  setSortOrder: (order) => set({ sortOrder: order }),
+  setShowActiveOnly: (val) => set({ showActiveOnly: val }),
 
   addLead: async (formData) => {
     set({ isSubmitting: true, error: null });
@@ -25,7 +29,7 @@ export const useLeadStore = create((set) => ({
   },
 
   fetchLeads: async (params = {}) => {
-    const res = await api.get('/leads', { params });
+    const res = await api.get('/leads', { params: { limit: 1000, ...params } });
     set({ leads: res.data.leads });
     return res.data;
   },
@@ -35,6 +39,7 @@ export const useLeadStore = create((set) => ({
     set((state) => ({
       leads: state.leads.map((l) => (l._id === id ? res.data : l)),
     }));
+    return res.data;
   },
 
   deleteLead: async (id) => {
