@@ -1,18 +1,24 @@
 import { motion } from 'framer-motion';
 import { useLeadStore } from '../store/useLeadStore';
 import { useAuthStore } from '../store/useAuthStore';
+import { useEffect } from 'react';
 
 export default function Admin() {
-  const { leads, searchQuery, setSearchQuery, updateLeadStatus } = useLeadStore();
+  const { leads, searchQuery, setSearchQuery, updateLeadStatus, fetchLeads } = useLeadStore();
   const logout = useAuthStore((state) => state.logout);
 
-  const filteredLeads = leads.filter(lead => 
-    lead.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+  useEffect(() => {
+    fetchLeads();
+  },[fetchLeads])
+
+
+  const filteredLeads = leads.filter(lead =>
+    lead.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     lead.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}
       className="max-w-5xl mx-auto px-6 py-12"
     >
@@ -27,9 +33,9 @@ export default function Admin() {
       </div>
 
       <div className="relative mb-8">
-        <input 
-          type="text" 
-          placeholder="Filter pipeline by identifier or vector..." 
+        <input
+          type="text"
+          placeholder="Filter pipeline by identifier or vector..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full p-4 pl-12 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 outline-none transition-all shadow-sm"
@@ -47,9 +53,9 @@ export default function Admin() {
         ) : (
           <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
             {filteredLeads.map((lead, i) => (
-              <motion.li 
+              <motion.li
                 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                key={lead.id} 
+                key={lead.id}
                 className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors gap-4"
               >
                 <div>
@@ -57,10 +63,10 @@ export default function Admin() {
                   <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">{lead.email} &bull; Tier: {lead.budget}</p>
                   <p className="text-sm text-zinc-600 dark:text-zinc-300 mt-2 max-w-xl">{lead.message}</p>
                 </div>
-                
+
                 <div className="flex items-center gap-3 w-full md:w-auto">
                   <div className={`h-2 w-2 rounded-full ${lead.status === 'New' ? 'bg-blue-500' : lead.status === 'Contacted' ? 'bg-amber-500' : 'bg-emerald-500'}`} />
-                  <select 
+                  <select
                     value={lead.status}
                     onChange={(e) => updateLeadStatus(lead.id, e.target.value)}
                     className="p-2 text-sm font-medium border border-zinc-200 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-950 cursor-pointer outline-none w-full md:w-auto"
